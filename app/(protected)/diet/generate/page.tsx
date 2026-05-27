@@ -13,7 +13,6 @@ import {
   User,
   AlertCircle,
   Leaf,
-  ChevronLeft,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -38,6 +37,7 @@ import {
 
 import { AppHeader } from "@/components/layout/app-header";
 import { fetchWithAuth } from "@/lib/fetch-with-auth";
+import { API_ERRORS } from "@/lib/errors/api-erros";
 
 function LoadingOverlay() {
   return (
@@ -103,6 +103,7 @@ function ToggleCard({
 export default function GenerateDietPage() {
   const router = useRouter();
   const [isGenerating, setIsGenerating] = useState(false);
+  const [apiError, setApiError] = useState("");
 
   const {
     register,
@@ -158,12 +159,12 @@ export default function GenerateDietPage() {
         body: JSON.stringify(data),
       });
 
-      if (!response.ok) {
-        throw new Error("Erro ao gerar dieta");
-      }
-
       const result = await response.json();
 
+      if (!response.ok) {
+        setApiError(API_ERRORS[result.error as keyof typeof API_ERRORS]);
+        return;
+      }
       router.push(`/diet/${result.id}`);
     } catch (error) {
       console.log(error);
@@ -418,6 +419,11 @@ export default function GenerateDietPage() {
                 </div>
               </CardContent>
             </Card>
+            {apiError && (
+              <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3">
+                <p className="text-sm text-destructive">{apiError}</p>
+              </div>
+            )}
 
             {/* Submit Button */}
             <Button
