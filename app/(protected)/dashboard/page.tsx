@@ -16,9 +16,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { API_URL } from "@/lib/api";
+
 import { AppHeader } from "@/components/layout/app-header";
 import Link from "next/link";
+import { fetchWithAuth } from "@/lib/fetch-with-auth";
 
 function StatCard({
   icon: Icon,
@@ -187,24 +188,17 @@ export default function DashboardPage() {
   useEffect(() => {
     async function loadDashboard() {
       try {
-        const token = localStorage.getItem("token");
-
         const [userResponse, dietsResponse] = await Promise.all([
-          fetch(`${API_URL}/users/me`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }),
-
-          fetch(`${API_URL}/diet/my-plans`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }),
+          fetchWithAuth("/users/me"),
+          fetchWithAuth("/diet/my-plans"),
         ]);
 
         const userData = await userResponse.json();
         const dietsData = await dietsResponse.json();
+
+        if (!userResponse.ok || !dietsResponse.ok) {
+          return;
+        }
 
         setUser(userData);
         setDiets(dietsData);
