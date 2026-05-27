@@ -362,6 +362,11 @@ export default function DietDetailPage() {
 
       const data: DietResponse = await response.json();
 
+      if (!response.ok) {
+        setFetchState("empty");
+        return;
+      }
+
       setDiet(data);
 
       setFetchState("success");
