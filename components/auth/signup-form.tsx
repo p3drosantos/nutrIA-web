@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { signupSchema, type SignupFormData } from "@/lib/validations/auth";
 
 import { fetchWithAuth } from "@/lib/fetch-with-auth";
+import { API_ERRORS } from "@/lib/errors/api-erros";
 
 interface SignupFormProps {
   onSwitchToLogin: () => void;
@@ -46,7 +47,10 @@ export function SignupForm({ onSwitchToLogin }: SignupFormProps) {
       console.log(result);
 
       if (!response.ok) {
-        setError(result);
+        setError(
+          API_ERRORS[result.error as keyof typeof API_ERRORS] ||
+            "Ocorreu um erro ao criar sua conta.",
+        );
         return;
       }
 
