@@ -29,11 +29,17 @@ import {
 } from "lucide-react";
 import type { DietPlan } from "@/lib/types/diet";
 import { fetchWithAuth } from "@/lib/fetch-with-auth";
+import { API_ERRORS } from "@/lib/errors/api-erros";
 
 type UpdateDietResponse = {
   success: boolean;
   message: string;
   dietPlan: DietPlan;
+};
+
+type ApiErrorResponse = {
+  error: string;
+  message: string;
 };
 
 type UpdateDietSheetProps = {
@@ -105,26 +111,19 @@ export function UpdateDietSheet({ dietId, onSuccess }: UpdateDietSheetProps) {
           userRequest: prompt.trim(),
         }),
       });
-      if (response.status === 429) {
-        const data = await response.json().catch(() => null);
-        console.log("Limite de solicitações excedido:", data);
+
+      const data = await response.json();
+      if (!response.ok) {
+        const errorData = data as ApiErrorResponse;
         setRequestState("error");
-        setErrorMessage(
-          data ||
-            "Limite de solicitações excedido. Tente novamente mais tarde.",
-        );
+        setErrorMessage(API_ERRORS[errorData.error as keyof typeof API_ERRORS]);
         return;
       }
+      const successData = data as UpdateDietResponse;
 
-      if (!response.ok) {
-        throw new Error("Erro ao atualizar a dieta. Tente novamente.");
-      }
+      setSystemNotes(successData.message);
 
-      const data: UpdateDietResponse = await response.json();
-
-      setSystemNotes(data.message);
-
-      if (data.success) {
+      if (successData.success) {
         setRequestState("success");
         setPrompt("");
 
