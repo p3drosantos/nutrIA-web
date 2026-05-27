@@ -338,7 +338,7 @@ export function UpdateDietSheet({ dietId, onSuccess }: UpdateDietSheetProps) {
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
                     placeholder="Ex: Quero trocar o café da manhã por algo com mais proteína..."
-                    className="min-h-[120px] resize-none border-border/60 bg-secondary/20 pr-4 text-base placeholder:text-muted-foreground/60 focus:border-primary/50 focus:ring-primary/20 sm:min-h-[140px]"
+                    className="min-h-30 resize-none border-border/60 bg-secondary/20 pr-4 text-base placeholder:text-muted-foreground/60 focus:border-primary/50 focus:ring-primary/20 sm:min-h-35"
                   />
                   <Badge
                     variant="secondary"

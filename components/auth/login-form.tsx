@@ -12,6 +12,7 @@ import { loginSchema, type LoginFormData } from "@/lib/validations/auth";
 
 import { API_URL } from "@/lib/api";
 import { useRouter } from "next/navigation";
+import { API_ERRORS } from "@/lib/errors/api-erros";
 
 interface LoginFormProps {
   onSwitchToSignup: () => void;
@@ -48,7 +49,11 @@ export function LoginForm({ onSwitchToSignup }: LoginFormProps) {
       const result = await response.json();
 
       if (!response.ok) {
-        setError(result);
+        setError(
+          API_ERRORS[result.error as keyof typeof API_ERRORS] ||
+            "Ocorreu um erro ao fazer login.",
+        );
+
         return;
       }
 
