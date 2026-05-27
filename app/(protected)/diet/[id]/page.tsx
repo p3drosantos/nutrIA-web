@@ -362,8 +362,13 @@ export default function DietDetailPage() {
 
       const data: DietResponse = await response.json();
 
-      if (!response.ok) {
+      if (response.status === 404) {
         setFetchState("empty");
+        return;
+      }
+
+      if (!response.ok) {
+        setFetchState("error");
         return;
       }
 
