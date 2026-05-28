@@ -88,7 +88,9 @@ function MealPreviewCard({
         <Icon className="h-4 w-4" />
       </div>
       <div className="flex-1">
-        <p className="text-sm font-medium text-foreground">{meal.name}</p>
+        <p className="text-sm font-medium text-foreground truncate">
+          {meal.name}
+        </p>
         <p className="text-xs text-muted-foreground">{meal.time}</p>
       </div>
       <Badge variant="secondary" className="font-mono text-xs">
@@ -291,7 +293,7 @@ export default function DashboardPage() {
         {/* Main Content Grid */}
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Current Diet - Larger Card */}
-          <Card className="lg:col-span-2">
+          <Card className="lg:col-span-2 overflow-hidden min-w-0">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <div>
                 <CardTitle className="text-lg">Ultima dieta gerada</CardTitle>
@@ -348,7 +350,7 @@ export default function DashboardPage() {
                       Visao da semana
                     </p>
 
-                    <div className="flex gap-2 overflow-x-auto pb-2">
+                    <div className="flex gap-2 overflow-x-auto pb-2 scroll-hide whitespace-nowrap">
                       {weekDays.map(([day, meals]) => {
                         const calories = (meals as any[]).reduce(
                           (acc, meal) => acc + meal.calories,
@@ -408,7 +410,7 @@ export default function DashboardPage() {
           </Card>
 
           {/* Diet History */}
-          <Card>
+          <Card className="min-w-0 w-full overflow-hidden">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <History className="h-4 w-4 text-primary" />
@@ -456,7 +458,7 @@ export default function DashboardPage() {
                     return (
                       <div
                         key={diet.id}
-                        className="group flex cursor-pointer items-center justify-between rounded-lg border border-border/50 bg-secondary/30 p-3 transition-all hover:border-primary/30 hover:bg-secondary/50"
+                        className="min-w-0 group flex cursor-pointer items-center justify-between rounded-lg border border-border/50 bg-secondary/30 p-3 transition-all hover:border-primary/30 hover:bg-secondary/50"
                       >
                         <div>
                           <p className="text-sm font-medium text-foreground">
