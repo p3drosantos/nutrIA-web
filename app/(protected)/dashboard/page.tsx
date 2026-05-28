@@ -12,6 +12,7 @@ import {
   Coffee,
   History,
   Plus,
+  ArrowRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -125,6 +126,8 @@ function DayPill({
 export default function DashboardPage() {
   const [user, setUser] = useState<any>(null);
   const [diets, setDiets] = useState<any[]>([]);
+
+  const hasDiets = diets.length > 0;
 
   const currentDiet = diets?.[diets.length - 1];
 
@@ -252,32 +255,36 @@ export default function DashboardPage() {
             icon={Target}
             label="Objetivo"
             value={
-              diets?.[diets.length - 1]?.goal === "lose_weight"
-                ? "Perda de peso"
-                : "ganho de massa "
+              !hasDiets
+                ? "--"
+                : diets[diets.length - 1]?.goal === "lose_weight"
+                  ? "Perda de peso"
+                  : "Ganho de massa"
             }
           />
           <StatCard
             icon={Flame}
             label="Calorias alvo"
             value={
-              dietPlan[selectedDay]?.reduce(
-                (acc: number, meal: any) => acc + meal.calories,
-                0,
-              ) || 0
+              hasDiets
+                ? dietPlan[selectedDay]?.reduce(
+                    (acc: number, meal: any) => acc + meal.calories,
+                    0,
+                  ) || 0
+                : "--"
             }
-            unit="kcal"
+            unit={hasDiets ? "kcal" : undefined}
             accent
           />
           <StatCard
             icon={Utensils}
             label="Refeicoes/dia"
-            value={dietPlan[selectedDay]?.length || 0}
+            value={hasDiets ? dietPlan[selectedDay]?.length || 0 : "--"}
           />
           <StatCard
             icon={TrendingUp}
             label="Semanas ativas"
-            value={weeksActive}
+            value={hasDiets ? weeksActive : "--"}
           />
         </section>
 
@@ -299,69 +306,104 @@ export default function DashboardPage() {
                     currentDiet ? `/diet/${currentDiet.id}` : "/diet/generate"
                   }
                 >
-                  Ver completa
-                  <ChevronRight className="h-4 w-4" />
+                  {currentDiet ? "Ver dieta" : "Gerar dieta"}
+                  {currentDiet ? (
+                    <ArrowRight className="h-4 w-4" />
+                  ) : (
+                    <Plus className="h-4 w-4" />
+                  )}
                 </Link>
               </Button>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Week Overview */}
-              <div>
-                <p className="mb-3 text-sm font-medium text-muted-foreground">
-                  Visao da semana
-                </p>
-                <div className="flex gap-2 overflow-x-auto pb-2">
-                  {weekDays.map(([day, meals]) => {
-                    const calories = (meals as any[]).reduce(
-                      (acc, meal) => acc + meal.calories,
-                      0,
-                    );
+              {!hasDiets ? (
+                <div className="flex flex-col items-center justify-center gap-4 py-14 text-center">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+                    <Sparkles className="h-8 w-8 text-primary" />
+                  </div>
 
-                    return (
-                      <div
-                        key={day}
-                        onClick={() => setSelectedDay(day)}
-                        className="cursor-pointer"
-                      >
-                        <DayPill
-                          day={{
-                            name: day,
-                            calories,
+                  <div className="space-y-2">
+                    <h3 className="text-xl font-semibold text-foreground">
+                      Sua jornada começa agora
+                    </h3>
+
+                    <p className="max-w-md text-sm text-muted-foreground">
+                      Gere sua primeira dieta personalizada com IA e acompanhe
+                      suas refeições, calorias e evolução semanal.
+                    </p>
+                  </div>
+
+                  <Button asChild size="lg" className="gap-2">
+                    <Link href="/diet/generate">
+                      <Plus className="h-4 w-4" />
+                      Gerar primeira dieta
+                    </Link>
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  {/* Week Overview */}
+                  <div>
+                    <p className="mb-3 text-sm font-medium text-muted-foreground">
+                      Visao da semana
+                    </p>
+
+                    <div className="flex gap-2 overflow-x-auto pb-2">
+                      {weekDays.map(([day, meals]) => {
+                        const calories = (meals as any[]).reduce(
+                          (acc, meal) => acc + meal.calories,
+                          0,
+                        );
+
+                        return (
+                          <div
+                            key={day}
+                            onClick={() => setSelectedDay(day)}
+                            className="cursor-pointer"
+                          >
+                            <DayPill
+                              day={{
+                                name: day,
+                                calories,
+                              }}
+                              active={day === selectedDay}
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Today's Meals */}
+                  <div>
+                    <div className="mb-3 flex items-center justify-between">
+                      <p className="text-sm font-medium text-muted-foreground">
+                        Refeicoes de hoje
+                      </p>
+
+                      <Badge variant="outline" className="font-mono">
+                        <Flame className="mr-1 h-3 w-3 text-primary" />
+                        {totalCalories}
+                        kcal
+                      </Badge>
+                    </div>
+
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      {selectedMeals.map((meal: any, index: number) => (
+                        <MealPreviewCard
+                          key={index}
+                          meal={{
+                            name: meal.mealName,
+                            time: meal.time,
+                            calories: meal.calories,
+                            icon: Coffee,
                           }}
-                          active={day === selectedDay}
                         />
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Today's Meals */}
-              <div>
-                <div className="mb-3 flex items-center justify-between">
-                  <p className="text-sm font-medium text-muted-foreground">
-                    Refeicoes de hoje
-                  </p>
-                  <Badge variant="outline" className="font-mono">
-                    <Flame className="mr-1 h-3 w-3 text-primary" />
-                    {totalCalories}
-                    kcal
-                  </Badge>
-                </div>
-                <div className="grid gap-2 sm:grid-cols-2">
-                  {selectedMeals.map((meal: any, index: number) => (
-                    <MealPreviewCard
-                      key={index}
-                      meal={{
-                        name: meal.mealName,
-                        time: meal.time,
-                        calories: meal.calories,
-                        icon: Coffee,
-                      }}
-                    />
-                  ))}
-                </div>
-              </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
 
@@ -374,54 +416,80 @@ export default function DashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {diets.map((diet: any) => {
-                const allMeals = Object.values(diet.dietPlan).flat() as any[];
-
-                const totalCalories = allMeals.reduce(
-                  (acc: number, meal: any) => acc + meal.calories,
-                  0,
-                );
-
-                const daysWithMeals = Object.values(diet.dietPlan).filter(
-                  (meals: any) => (meals as any[]).length > 0,
-                ).length;
-
-                const averageCalories = Math.round(
-                  totalCalories / (daysWithMeals || 1),
-                );
-
-                return (
-                  <div
-                    key={diet.id}
-                    className="group flex cursor-pointer items-center justify-between rounded-lg border border-border/50 bg-secondary/30 p-3 transition-all hover:border-primary/30 hover:bg-secondary/50"
-                  >
-                    <div>
-                      <p className="text-sm font-medium text-foreground">
-                        {new Date(diet.createdAt).toLocaleDateString("pt-BR")}
-                      </p>
-
-                      <p className="text-xs text-muted-foreground">
-                        {diet.goal === "lose_weight" && "Perda de peso"}
-                        {diet.goal === "gain_muscle" && "Ganho de massa"}
-                      </p>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-muted-foreground">
-                        {averageCalories} kcal
-                      </span>
-
-                      <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
-                    </div>
+              {!hasDiets ? (
+                <div className="flex flex-col items-center justify-center gap-3 py-10 text-center">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-secondary">
+                    <History className="h-6 w-6 text-muted-foreground" />
                   </div>
-                );
-              })}
-              <Button
-                variant="ghost"
-                className="w-full text-muted-foreground hover:text-foreground"
-              >
-                <Link href="/diet/history">Ver historico completo</Link>
-              </Button>
+
+                  <div className="space-y-1">
+                    <p className="font-medium text-foreground">
+                      Nenhuma dieta encontrada
+                    </p>
+
+                    <p className="text-sm text-muted-foreground">
+                      Seu histórico aparecerá aqui após gerar sua primeira
+                      dieta.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {diets.map((diet: any) => {
+                    const allMeals = Object.values(
+                      diet.dietPlan,
+                    ).flat() as any[];
+
+                    const totalCalories = allMeals.reduce(
+                      (acc: number, meal: any) => acc + meal.calories,
+                      0,
+                    );
+
+                    const daysWithMeals = Object.values(diet.dietPlan).filter(
+                      (meals: any) => (meals as any[]).length > 0,
+                    ).length;
+
+                    const averageCalories = Math.round(
+                      totalCalories / (daysWithMeals || 1),
+                    );
+
+                    return (
+                      <div
+                        key={diet.id}
+                        className="group flex cursor-pointer items-center justify-between rounded-lg border border-border/50 bg-secondary/30 p-3 transition-all hover:border-primary/30 hover:bg-secondary/50"
+                      >
+                        <div>
+                          <p className="text-sm font-medium text-foreground">
+                            {new Date(diet.createdAt).toLocaleDateString(
+                              "pt-BR",
+                            )}
+                          </p>
+
+                          <p className="text-xs text-muted-foreground">
+                            {diet.goal === "lose_weight" && "Perda de peso"}
+                            {diet.goal === "gain_muscle" && "Ganho de massa"}
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground">
+                            {averageCalories} kcal
+                          </span>
+
+                          <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                  <Button
+                    variant="ghost"
+                    className="w-full text-muted-foreground hover:text-foreground"
+                  >
+                    <Link href="/diet/history">Ver historico completo</Link>
+                  </Button>
+                </>
+              )}
             </CardContent>
           </Card>
         </div>
