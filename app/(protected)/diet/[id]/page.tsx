@@ -529,15 +529,17 @@ export default function DietDetailPage() {
         </section>
 
         {/* Day Selector */}
-        <section className="mb-6">
-          <h2 className="mb-3 text-sm font-medium text-muted-foreground">
+        <section className="mb-6 ">
+          <h2 className="mb-3 text-sm font-medium text-muted-foreground text-center">
             Selecione o dia
           </h2>
-          <DaySelector
-            selectedDay={selectedDay}
-            onSelectDay={setSelectedDay}
-            dietPlan={diet.dietPlan}
-          />
+          <div className="flex justify-center">
+            <DaySelector
+              selectedDay={selectedDay}
+              onSelectDay={setSelectedDay}
+              dietPlan={diet.dietPlan}
+            />
+          </div>
         </section>
 
         {/* Day Info */}
