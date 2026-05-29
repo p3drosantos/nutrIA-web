@@ -16,4 +16,6 @@ export const API_ERRORS = {
   AI_RESPONSE_VALIDATION_ERROR: "Erro de validação da resposta da IA.",
   INTERNAL_SERVER_ERROR: "Erro interno do servidor.",
   DIET_NOT_FOUND_ERROR: "Dieta não encontrada.",
+  AI_UNAVAILABLE_ERROR:
+    "Serviço de IA indisponível. Tente novamente mais tarde.",
 };
