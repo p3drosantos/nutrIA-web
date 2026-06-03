@@ -24,9 +24,13 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 type AppHeaderProps = {
   showBackButton?: boolean;
+  userName?: string;
 };
 
-export function AppHeader({ showBackButton = false }: AppHeaderProps) {
+export function AppHeader({
+  showBackButton = false,
+  userName,
+}: AppHeaderProps) {
   const handleLogOut = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("refreshToken");
@@ -63,7 +67,7 @@ export function AppHeader({ showBackButton = false }: AppHeaderProps) {
             <Button variant="ghost" className="relative h-9 w-9 rounded-full">
               <Avatar className="h-9 w-9">
                 <AvatarFallback className="bg-primary/20 text-primary">
-                  P
+                  {userName ? userName.charAt(0).toUpperCase() : "P"}
                 </AvatarFallback>
               </Avatar>
             </Button>

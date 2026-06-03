@@ -226,7 +226,7 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-background">
       {/* Header */}
 
-      <AppHeader />
+      <AppHeader userName={user?.name} />
 
       <main className="mx-auto max-w-6xl px-4 py-8">
         {/* Greeting Section */}
